@@ -7,7 +7,7 @@ import Router from 'next/router';
 import Loader from '../components/Loader';
 import { MainLayout } from '../components/MainLayout';
 import { MyPosts } from '../interfaces/posts';
-import { deletePost, setSsrPostsData } from '../redux/actions/posts';
+import { deletePost, setSsrPostsData, gettingPostsData } from '../redux/actions/posts';
 
 const HeadText = styled.h1`
     text-align: center;
@@ -98,6 +98,7 @@ const Index = ({ ssrData: ServerPost }: PostsPageProps) => {
     const posts = useSelector(({ posts }) => posts.posts);
 
     useEffect(() => {
+        posts === null ? dispatch(gettingPostsData()) : null;
         ServerPost ? dispatch(setSsrPostsData(ServerPost)) : null;
     }, [dispatch]);
 
@@ -133,11 +134,7 @@ const Index = ({ ssrData: ServerPost }: PostsPageProps) => {
     );
 };
 
-Index.getInitialProps = async ({ req }) => {
-    if (!req) {
-        return { post: null };
-    }
-
+Index.getInitialProps = async () => {
     const ssrData = await axios('https://simple-blog-api.crew.red/posts').then((data) => data.data.reverse());
     return { ssrData };
 };
